@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmotionSense – Text Emotion Analysis | Experiment 08</title>
+  <meta name="description" content="EmotionSense — Educational rule-based text and speech emotion detection web application for Text and Speech Analysis Experiment 08.">
+  <meta name="keywords" content="Text and Speech Analysis, Emotion Analysis, Natural Language Processing, Rule-based Sentiment, Speech-to-Text">
+  
+  <!-- Modern Google Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>😊</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <div class="container">
+    
+    <!-- Top Utility Bar -->
+    <header class="app-header">
+      <div class="top-bar-controls">
+        <div class="lab-badge">
+          <span class="pulse-dot"></span>
+          <span>TEXT &amp; SPEECH ANALYSIS &bull; EXP 08</span>
+        </div>
+        <button id="themeToggle" class="theme-toggle-btn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="main-title-wrap">
+        <div class="course-tag">TEXT &amp; SPEECH ANALYSIS</div>
+        <h1 class="main-title">EmotionSense</h1>
+        <div class="experiment-subtitle">Experiment 08 — Emotion Analysis</div>
+        <p class="app-description">
+          Analyze text and identify the emotion expressed by the user using rule-based lexical matching and interactive speech-to-text recognition.
+        </p>
+      </div>
+    </header>
+
+    <!-- Supported Emotions Quick Ribbon -->
+    <section class="emotion-pills-bar" aria-label="Supported Emotions">
+      <div class="emotion-pill" data-emotion="happy" title="Click to test Happy example">
+        <span>😊</span><span>Happy</span>
+      </div>
+      <div class="emotion-pill" data-emotion="sad" title="Click to test Sad example">
+        <span>😢</span><span>Sad</span>
+      </div>
+      <div class="emotion-pill" data-emotion="angry" title="Click to test Angry example">
+        <span>😡</span><span>Angry</span>
+      </div>
+      <div class="emotion-pill" data-emotion="fear" title="Click to test Fear example">
+        <span>😨</span><span>Fear</span>
+      </div>
+      <div class="emotion-pill" data-emotion="surprise" title="Click to test Surprise example">
+        <span>😲</span><span>Surprise</span>
+      </div>
+      <div class="emotion-pill" data-emotion="neutral" title="Click to test Neutral example">
+        <span>😐</span><span>Neutral</span>
+      </div>
+    </section>
+
+    <!-- Main Workspace Card -->
+    <main class="workspace-card">
+      <div class="input-header-row">
+        <label for="textInput" class="input-label">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Enter User Statement or Speak
+        </label>
+        
+        <div class="quick-examples-dropdown-wrap">
+          <label for="quickExampleSelect" style="font-size: 0.8rem; color: var(--text-dim);">Quick Preset:</label>
+          <select id="quickExampleSelect" class="quick-select" aria-label="Select Example Phrase">
+            <!-- Populated via script.js -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Realtime Speech-to-Text Feedback Banner -->
+      <div id="speechBanner" class="speech-status-banner">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <div class="audio-waves">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <span id="speechText">Listening to speech...</span>
+        </div>
+        <span style="font-size: 0.75rem; opacity: 0.8;">Web Speech API Active</span>
+      </div>
+
+      <!-- Textarea Input -->
+      <div class="textarea-wrapper">
+        <textarea 
+          id="textInput" 
+          class="main-textarea" 
+          rows="4" 
+          placeholder="Type your sentence here, e.g., 'I am extremely happy with my project!' or click 'Speak Emotion' to talk..."
+          spellcheck="false"
+        ></textarea>
+        
+        <div class="textarea-meta">
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Tip: Press <code>Ctrl + Enter</code> to quickly analyze</span>
+          <div class="char-word-counts">
+            <span id="wordCount">0 words</span>
+            <span id="charCount">0 chars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button Controls -->
+      <div class="actions-grid">
+        <button id="analyzeBtn" class="btn btn-primary" id="analyzeBtn" title="Run rule-based emotion detection">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Analyze Emotion
+        </button>
+
+        <button id="speakBtn" class="btn btn-speech" title="Use Web Speech API Speech-to-Text to dictate emotion statement">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          Speak Emotion
+        </button>
+
+        <button id="loadExampleBtn" class="btn btn-secondary" title="Load sample input phrases">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Load Example
+        </button>
+
+        <button id="clearBtn" class="btn btn-ghost" title="Clear text and results">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Clear
+        </button>
+      </div>
+    </main>
+
+    <!-- Results Section -->
+    <section id="resultsContainer" class="results-container" aria-live="polite">
+      <div class="results-grid">
+        
+        <!-- Detected Emotion Primary Card -->
+        <div id="heroEmotionCard" class="emotion-hero-card">
+          <div class="hero-header-label">Detected Emotion</div>
+          <div id="heroEmoji" class="hero-emoji">😊</div>
+          <h2 id="heroEmotionTitle" class="hero-emotion-title">HAPPY</h2>
+          <div id="heroSentimentBadge" class="hero-sentiment-badge">Valence: Positive</div>
+
+          <div class="confidence-box">
+            <div>
+              <div class="confidence-label">Confidence</div>
+              <div id="heroConfidenceVal" class="confidence-val-big">87%</div>
+            </div>
+            <button id="audioReadoutBtn" class="btn btn-ghost" style="padding: 0.5rem; font-size: 0.8rem;" title="Listen to audio announcement">
+              <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Emotion Distribution Chart & Breakdown Panel -->
+        <div class="analytics-panel">
+          <div>
+            <div class="panel-title">
+              <span>Emotion Distribution Chart</span>
+              <span class="badge-count">6 Emotions Evaluated</span>
+            </div>
+
+            <!-- Dynamic Distribution Bars Container -->
+            <div id="emotionBarsContainer" class="emotion-bars-container">
+              <!-- Dynamically populated rows for all 6 emotions -->
+            </div>
+          </div>
+
+          <!-- Linguistic Keyword Evidence & Highlighted Text -->
+          <div class="keyword-insights-card">
+            <div class="insights-header">Detected Emotion Keywords &amp; Modifiers</div>
+            <div id="matchedKeywordsList" class="matched-keywords-wrap">
+              <!-- Tags populated dynamically -->
+            </div>
+
+            <div style="margin-top: 0.85rem;">
+              <div class="insights-header" style="margin-bottom: 0.35rem;">Token Highlight Analysis</div>
+              <div id="highlightPreview" class="highlight-preview-box">
+                <!-- Highlighted sentence -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Educational & Theoretical Foundation Section -->
+    <section class="educational-section">
+      
+      <!-- Core Theory Card -->
+      <article class="edu-card">
+        <h2 class="edu-card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          Theory &amp; Concept
+        </h2>
+
+        <div class="edu-quote-banner">
+          “Emotion analysis attempts to identify the emotional state expressed in text or speech.”
+        </div>
+
+        <p class="edu-text">
+          <strong>Academic Notice:</strong> This is an <strong>educational rule-based demonstration</strong> developed for laboratory study. Unlike black-box neural networks, rule-based systems rely on transparent semantic dictionaries, morphological stemming, contextual negation rules, and modifier weightings to systematically score emotional intensity.
+        </p>
+
+        <!-- Lexicon Inspector Accordion -->
+        <div class="lexicon-accordion">
+          <div id="lexiconHeader" class="lexicon-header">
+            <span>📚 Explore Rule-Based Emotion Lexicons</span>
+            <span id="lexiconArrow">▼</span>
+          </div>
+          <div id="lexiconBody" class="lexicon-body" style="display: none;">
+            <!-- Populated via script.js -->
+          </div>
+        </div>
+      </article>
+
+      <!-- Processing Pipeline Card -->
+      <article class="edu-card">
+        <h2 class="edu-card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+          </svg>
+          Analysis Pipeline
+        </h2>
+
+        <div class="pipeline-steps">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Speech / Text Ingestion</strong>
+              <p>Captures vocal utterance via Web Speech API or manual text input.</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Tokenization &amp; Stemming</strong>
+              <p>Splits raw text into tokens, normalizes case, and stems affixes (e.g. <em>crying &rarr; cry</em>).</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Context &amp; Modifier Evaluation</strong>
+              <p>Scans a 2-word lookback window for intensifiers (<em>extremely &times; 2.0</em>) and negations (<em>not happy</em>).</p>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>Confidence &amp; Distribution Normalization</strong>
+              <p>Calculates relative category weights and normalizes distribution to sum strictly to 100%.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>
+        <strong>EmotionSense</strong> &bull; Text &amp; Speech Analysis Laboratory Series &bull; Experiment 08
+      </p>
+      <p style="margin-top: 0.35rem; font-size: 0.8rem;">
+        Developed with pure Vanilla HTML5, CSS3, and JavaScript &bull; Runs 100% locally with zero backend dependencies
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast-msg" role="status" aria-live="polite"></div>
+
+  <!-- Application Logic -->
+  <script src="script.js"></script>
+</body>
+</html>
